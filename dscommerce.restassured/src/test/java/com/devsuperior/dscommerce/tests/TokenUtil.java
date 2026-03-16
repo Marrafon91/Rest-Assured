@@ -1,12 +1,9 @@
 package com.devsuperior.dscommerce.tests;
 
-import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 
-import static io.restassured.matcher.RestAssuredMatchers.*;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
 
 public class TokenUtil {
 

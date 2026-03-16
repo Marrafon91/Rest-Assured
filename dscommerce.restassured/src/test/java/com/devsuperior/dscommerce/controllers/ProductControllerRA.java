@@ -6,6 +6,7 @@ import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +20,7 @@ public class ProductControllerRA {
 
     private String clientUsername, clientPassword, adminUsername, adminPassword;
     private String clientToken, adminToken, invalidToken;
-    private Long existingProductId, nonExistingProductId;
+    private Long existingProductId, nonExistingProductId, dependentProductId;
     private String productName;
 
     private Map<String, Object> postProductInstance;
@@ -27,6 +28,10 @@ public class ProductControllerRA {
     @BeforeEach
     public void setUp() {
         baseURI = "http://localhost:8080";
+
+        existingProductId = 25L;
+        nonExistingProductId = 1000L;
+        dependentProductId = 1L;
 
         clientUsername = "maria@gmail.com";
         clientPassword = "123456";
@@ -123,7 +128,7 @@ public class ProductControllerRA {
                 .get("/products?size=25")
                 .then()
                 .statusCode(200)
-                .body("content.findAll { it.price > 2000 }.name", hasItems("Smart TV", "PC Gamer Weed", "PC Gamer Foo"));
+                .body("content.findAll { it.price > 2000 }.name", hasItems("Smart TV", "PC Gamer Weed"));
     }
 
     @Test
@@ -266,6 +271,65 @@ public class ProductControllerRA {
                 .accept(ContentType.JSON)
                 .when()
                 .post("/products")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void deleteShouldReturnNoContentWhenIdExistsAdminLoggedInAndProductDeleted() {
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/products/{id}", existingProductId)
+                .then()
+                .statusCode(204);
+    }
+
+    @Test
+    public void deleteShouldReturnNotFoundWhenIdDoesNotExistsAndAdminLoggedIn() {
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/products/{id}", nonExistingProductId)
+                .then()
+                .statusCode(404)
+                .body("error", equalTo("Recurso não encontrado"))
+                .body("status", equalTo(404));
+    }
+
+    @Test
+    public void deleteShouldReturnBadRequestWhenDependentIdAndAdminLoggedIn() {
+        given()
+                .header("Authorization", "Bearer " + adminToken)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/products/{id}", dependentProductId)
+                .then()
+                .statusCode(400)
+                .body("error", equalTo("Falha de integridade referencial"))
+                .body("status", equalTo(400));
+    }
+
+    @Test
+    public void deleteShouldReturnForbiddenWhenClientLoggedIn() {
+        given()
+                .header("Authorization", "Bearer " + clientToken)
+                .accept(ContentType.JSON)
+                .when()
+                .delete("/products/{id}", existingProductId)
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    public void deleteShouldReturnUnauthorizedWhenNotLoggedInOrInvalidToken() {
+        given()
+                .header("Authorization", "Bearer " + invalidToken)
+                .contentType(ContentType.JSON)
+                .when()
+                .delete("/products/{id}", existingProductId)
                 .then()
                 .statusCode(401);
     }
