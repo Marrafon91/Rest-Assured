@@ -6,7 +6,6 @@ import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.beans.Transient;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -332,5 +331,24 @@ public class ProductControllerRA {
                 .delete("/products/{id}", existingProductId)
                 .then()
                 .statusCode(401);
+    }
+
+    @Test
+    public void findByIdShouldReturnExistsProductWhenIdExistsAndAdminLoggedIn() {
+        given()
+                .header("Content-Type", "application/json ")
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .when()
+                .get("/products/{id}", existingProductId)
+                .then()
+                .statusCode(200)
+                .body("id", is(25))
+                .body("name", equalTo("PC Gamer Foo"))
+                .body("price", is(4170.0F))
+                .body("imgUrl", equalTo("https://raw.githubusercontent.com/devsuperior/dscatalog-resources/master/backend/img/25-big.jpg"))
+                .body("categories.id", hasItem(3))
+                .body("categories.name", hasItem("Computadores"));
     }
 }
