@@ -16,6 +16,9 @@ public class UserDTO {
     private String phone;
     private LocalDate birthDate;
     private List<String> roles = new ArrayList<>();
+
+	public UserDTO() {
+	}
     
 	public UserDTO(Long id, String name, String email, String phone, LocalDate birthDate) {
 		this.id = id;
@@ -24,7 +27,7 @@ public class UserDTO {
 		this.phone = phone;
 		this.birthDate = birthDate;
 	}
-    
+
 	public UserDTO(User entity) {
 		id = entity.getId();
 		name = entity.getName();

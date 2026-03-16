@@ -1,7 +1,7 @@
 package com.devsuperior.dscommerce.controllers;
 
+import com.devsuperior.dscommerce.tests.TokenUtil;
 import io.restassured.http.ContentType;
-import org.codehaus.groovy.syntax.TokenUtil;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,8 @@ import static org.hamcrest.Matchers.*;
 
 public class ProductControllerRA {
 
+    private String clientUsername, clientPassword, adminUsername, adminPassword;
+    private String clientToken, adminToken, invalidToken;
     private Long existingProductId, nonExistingProductId;
     private String productName;
 
@@ -25,6 +27,16 @@ public class ProductControllerRA {
     @BeforeEach
     public void setUp() {
         baseURI = "http://localhost:8080";
+
+        clientUsername = "maria@gmail.com";
+        clientPassword = "123456";
+
+        adminUsername = "alex@gmail.com";
+        adminPassword = "123456";
+
+        clientToken = TokenUtil.obtainAccessToken(clientUsername, clientPassword);
+        adminToken = TokenUtil.obtainAccessToken(adminUsername, adminPassword);
+        invalidToken = adminToken + "xpto"; // invalidToken
 
         productName = "Macbook";
 
@@ -118,7 +130,7 @@ public class ProductControllerRA {
     public void insertProductShouldReturnProductCreatedWhenAdminLoggedIn() {
         //add dependencia no pom.xml
         JSONObject newProduct = new JSONObject(postProductInstance);
-        String adminToken = "";
+
         given()
                 .header("Content-Type", "application/json ")
                 .header("Authorization", "Bearer " + adminToken)
