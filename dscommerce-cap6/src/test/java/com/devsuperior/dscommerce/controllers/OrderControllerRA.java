@@ -192,6 +192,7 @@ public class OrderControllerRA {
 	@Test
 	public void insertShouldReturnForbiddenWhenAdminLogged() throws JSONException {
 		JSONObject newOrder = new JSONObject(postOrderInstance);
+		System.out.println("adminOnlyToken = " + adminOnlyToken);
 		
 		given()
 			.header("Content-type", "application/json")
@@ -204,7 +205,7 @@ public class OrderControllerRA {
 		.then()
 			.statusCode(403);
 	}
-	
+
 	@Test
 	public void insertShouldReturnUnauthorizedWhenInvalidToken() throws JSONException {
 		JSONObject newOrder = new JSONObject(postOrderInstance);

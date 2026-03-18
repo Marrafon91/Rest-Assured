@@ -163,7 +163,7 @@ public class ProductControllerRA {
 			.post("/products")
 		.then()
 			.statusCode(422)
-			.body("errors.message[0]", equalTo("Nome precisar ter de 3 a 80 caracteres"));
+			.body("errors.message[0]", equalTo("Nome precisa ter de 3 a 80 caracteres"));
 	}
 	
 	@Test
