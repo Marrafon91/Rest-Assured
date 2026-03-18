@@ -12,7 +12,6 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
 
 public class MovieControllerRA {
 
